@@ -5,7 +5,7 @@
     ""
   ],
   "BOTNAME": "Uzuki Mikata",
-  "PREFIX": "$",
+  "PREFIX": "/",
   "THEME_SETUP": {
     "THEME": "Fiery",
     "ADMIN": "Jhon Xyryll Samoy(XyryllPanget)",
