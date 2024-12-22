@@ -4,12 +4,12 @@
   "ADMINS": [
     ""
   ],
-  "BOTNAME": "BOTNAME",
-  "PREFIX": "/",
+  "BOTNAME": "Uzuki Mikata",
+  "PREFIX": "$",
   "THEME_SETUP": {
     "THEME": "Fiery",
-    "ADMIN": "Your Name",
-    "TITLE": "PAGEBOT",
+    "ADMIN": "Jhon Xyryll Samoy(XyryllPanget)",
+    "TITLE": "Team Xy Bot",
     "HTML": [
       "#CE2F16",
       "#fe8916",
