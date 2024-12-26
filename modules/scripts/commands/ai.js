@@ -1,33 +1,47 @@
 const axios = require('axios');
 
-module.exports = {
+module.exports.config = {
   name: 'ai',
-  description: 'Ask a question to ChatGPT',
-  author: 'Aljur Pogoy',
-  async execute(senderId, args, pageAccessToken, sendMessage) {
-    const prompt = args.join(' ');
+  author: 'Converted by XyryllPanget',
+  version: '1.0',
+  description: 'Provides AI-based assistance and answers user queries.',
+  selfListen: false,
+};
 
-    if (prompt === '') {
-      sendMessage(senderId, { text: 'Usage: ai <question>' }, pageAccessToken);
-      return;
+module.exports.run = async function({ event, args, api }) {
+  const senderId = event.sender.id;
+  const prompt = args.join(' ');
+
+  if (!prompt) {
+    api.sendMessage({
+      text: 'Usage: support <your question>'
+    }, senderId);
+    return;
+  }
+
+  api.sendMessage({
+    text: 'Processing your query. Please wait...'
+  }, senderId);
+
+  try {
+    const apiUrl = 'https://www.niroblr.cloud/api/gpt4?prompt=' + encodeURIComponent(prompt);
+    const response = await axios.get(apiUrl);
+
+    if (response.status === 200 && response.data?.response?.answer) {
+      const answer = response.data.response.answer;
+      api.sendMessage({
+        text: `Here’s what I found for you:\n\n${answer}`
+      }, senderId);
+    } else {
+      api.sendMessage({
+        text: 'Sorry, I could not process your query at the moment. Please try again later.'
+      }, senderId);
     }
 
-    sendMessage(senderId, { text: 'Thinking please wait...' }, pageAccessToken);
-
-    try {
-      const apiUrl = 'https://www.niroblr.cloud/api/gpt4?prompt=' + encodeURIComponent(prompt); // Construct the API URL
-      const response = await axios.get(apiUrl); // Use GET request
-
-      if (response.status === 200) {
-        const text = response.data.response.answer; // Assuming the response structure you provided
-        sendMessage(senderId, { text: `Kazuto Bot says: \n\n${text}` }, pageAccessToken);
-      } else {
-        sendMessage(senderId, { text: 'Oops! Something went wrong. Please try again later.' }, pageAccessToken);
-      }
-
-    } catch (error) {
-      console.error('Error calling API:', error);
-      sendMessage(senderId, { text: 'There was an error generating the content. Please try again later.' }, pageAccessToken);
-    }
+  } catch (error) {
+    console.error('Error calling API:', error);
+    api.sendMessage({
+      text: 'An error occurred while processing your request. Please try again later.'
+    }, senderId);
   }
 };
