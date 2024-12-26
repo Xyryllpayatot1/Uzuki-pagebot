@@ -22,12 +22,17 @@ module.exports.run = async function({ event, args }) {
               {
                 title: 'Hey there Uzuki Mikata Users!', // The title of the generic message
                 subtitle: 'This Project is supported by PageBot. Leave a like on their repository and support their work, again thanks for letting me using your build Yan Maglinte!', // The subtitle of the message
-                image_url: 'https://i.ibb.co/dJzSv5Q/pagebot.jpg', // The image URL
+                image_url: 'https://img.photouploads.com/file/PhotoUploads-com/SKhN.jpg', // The image URL
                 buttons: [
                   {
                     type: 'web_url',
                     url: 'https://www.facebook.com/yandeva.me',
                     title: 'Check Yan Maglinte Profile'
+                  },
+                  {
+                   type: 'web_url',
+                    url: 'https://www.facebook.com/XyryllPanget',
+                    title: 'Check My Owner profile'
                   },
                   {
                     type: 'postback',
