@@ -1,14 +1,19 @@
 const axios = require('axios');
 
 module.exports.config = {
-  name: 'ai',
-  author: 'Converted by XyryllPanget',
+  name: 'gpt',
+  author: 'Yan Maglinte',
   version: '1.0',
   description: 'Provides AI-based assistance and answers user queries.',
   selfListen: false,
 };
 
 module.exports.run = async function({ event, args, api }) {
+  if (!api || typeof api.sendMessage !== 'function') {
+    console.error('API object is undefined or sendMessage method is missing.');
+    return;
+  }
+
   const senderId = event.sender.id;
   const prompt = args.join(' ');
 
