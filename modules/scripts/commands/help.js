@@ -35,20 +35,7 @@ module.exports.run = function ({ event, args }) {
       }
     });
 
-    // Load and log event details
-    const eventFiles = fs
-      .readdirSync(eventsPath)
-      .filter((file) => file.endsWith(".js"));
-    message += "Events:\n";
-    eventFiles.forEach((file) => {
-      const event = require(path.join(eventsPath, file));
-      if (event.config) {
-        message += `- ${event.config.name}\n`;
-        message += `Author: ${event.config.author}\n`;
-        message += `Description: ${event.config.description}\n\n`;
-        // message += `Admin Only: ${event.config.adminOnly ? "Yes" : "No"}\n\n`;
-      }
-    });
+  
 
     message += "\u2B50 Thank you for using Uzuki Mikata!\n";
     message += "This is an early access version. If you encounter any issues or bugs, please contact my owner:\n";
