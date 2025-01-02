@@ -1,24 +1,23 @@
 const axios = require('axios');
 
 module.exports.config = {
-  name: 'Wikipedia',
+  name: 'Wikipedia', // From the provided snippet
   author: 'XyryllPanget',
   version: '1.0',
-  description: 'Fetches a summary of a topic from Wikipedia.',
+  description: 'Fetches the summary of a topic from Wikipedia.',
   selfListen: false,
   usePrefix: true,
   adminOnly: false,
-  category: 'Information',
+  category: 'Utility',
 };
 
 module.exports.run = async function ({ event, args, api }) {
-  // Check if the API object and sendMessage method exist
   if (!api || typeof api.sendMessage !== 'function') {
     console.error('API object is undefined or sendMessage method is missing.');
     return;
   }
 
-  const senderId = event.senderID || event.sender.id;
+  const senderId = event.senderID || event.sender.id; // Ensure sender ID is available
   const topic = args.join(' ');
 
   if (!topic) {
@@ -31,40 +30,41 @@ module.exports.run = async function ({ event, args, api }) {
     return;
   }
 
-  // Inform the user that their request is being processed
+  // Inform the user that the query is being processed
   api.sendMessage(
     {
-      text: `Fetching information about "${topic}" from Wikipedia. Please wait...`,
+      text: `Searching Wikipedia for "${topic}"... Please wait.`,
     },
     senderId
   );
 
   try {
-    const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`;
-    const response = await axios.get(apiUrl);
+    const response = await axios.get(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(topic)}`
+    );
+    const { title, extract, content_urls } = response.data;
 
-    if (response.status === 200 && response.data && response.data.extract) {
-      const summary = response.data.extract;
+    if (extract) {
+      const message = `Wikipedia Summary for "${title}":\n\n${extract}\n\nRead more: ${content_urls.desktop.page}`;
       api.sendMessage(
         {
-          text: `Here’s what I found about "${topic}":\n\n${summary}`,
+          text: message,
         },
         senderId
       );
     } else {
       api.sendMessage(
         {
-          text: `Sorry, I couldn’t find any information about "${topic}".`,
+          text: `No Wikipedia summary found for "${topic}".`,
         },
         senderId
       );
     }
   } catch (error) {
-    console.error('Error fetching Wikipedia data:', error);
-
+    console.error('Error fetching Wikipedia summary:', error);
     api.sendMessage(
       {
-        text: 'An error occurred while fetching the information. Please try again later.',
+        text: 'An error occurred while fetching the Wikipedia summary. Please try again later.',
       },
       senderId
     );
