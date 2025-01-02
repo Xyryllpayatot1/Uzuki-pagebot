@@ -4,7 +4,7 @@ module.exports.config = {
   name: 'Ai', // Using the snippet's title
   author: 'XyryllPanget',
   version: '1.0',
-  description: 'Provides AI-based assistance and answers user queries.',
+  description: 'Provides AI-based assistance and answers user queries(dont use prefix when using this cmd)',
   selfListen: false,
 };
 
