@@ -1,23 +1,24 @@
 const axios = require('axios');
 
 module.exports.config = {
-  name: 'Wikipedia', // Title from the provided snippet
+  name: 'Wikipedia',
   author: 'XyryllPanget',
   version: '1.0',
   description: 'Fetches a summary of a topic from Wikipedia.',
   selfListen: false,
-  usePrefix: true, // Command requires a prefix, e.g., "/"
-  adminOnly: false, // Command is available to all users
-  category: 'Information', // Categorizing as an information command
+  usePrefix: true,
+  adminOnly: false,
+  category: 'Information',
 };
 
 module.exports.run = async function ({ event, args, api }) {
+  // Check if the API object and sendMessage method exist
   if (!api || typeof api.sendMessage !== 'function') {
     console.error('API object is undefined or sendMessage method is missing.');
     return;
   }
 
-  const senderId = event.sender.id;
+  const senderId = event.senderID || event.sender.id;
   const topic = args.join(' ');
 
   if (!topic) {
