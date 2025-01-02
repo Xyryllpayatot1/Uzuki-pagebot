@@ -18,14 +18,15 @@ function containsInappropriateContent(result) {
 const bannedUsers = new Map();
 
 module.exports.config = {
-  name: 'google', // From the snippet
-  author: 'XyryllPanget',
+  name: 'google',
+  aliases: ['search', 'g'],
   version: '2.0',
+  author: 'XyryllPanget',
   description: 'Searches Google for a given query.',
-  selfListen: false,
-  usePrefix: true,
-  adminOnly: false,
   category: 'Utility',
+  usage: '/google <query>',
+  adminOnly: false,
+  usePrefix: true,
 };
 
 module.exports.run = async function ({ api, event, args }) {
