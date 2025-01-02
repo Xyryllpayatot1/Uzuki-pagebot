@@ -6,6 +6,9 @@ module.exports.config = {
   version: '1.0',
   description: 'Ask a question to Gemini Pro.',
   selfListen: false,
+  usePrefix: true, // Command requires a prefix, e.g., "/"
+  adminOnly: false, // Command is available to all users
+  category: 'Information', // Categorizing as an information command
 };
 
 module.exports.run = async function ({ event, args, api }) {
