@@ -1,8 +1,8 @@
 const axios = require('axios');
 
 module.exports.config = {
-  name: 'The Book of Knowledge', // Title from the provided snippet
-  author: 'Your Name',
+  name: 'Wikipedia', // Title from the provided snippet
+  author: 'XyryllPanget',
   version: '1.0',
   description: 'Fetches a summary of a topic from Wikipedia.',
   selfListen: false,
