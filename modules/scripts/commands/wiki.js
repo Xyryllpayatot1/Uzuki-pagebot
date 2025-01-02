@@ -1,11 +1,14 @@
 const axios = require('axios');
 
 module.exports.config = {
-  name: 'Wikipedia', // Title from the provided snippet
-  author: 'XyryllPanget',
+  name: 'The Book of Knowledge', // Title from the provided snippet
+  author: 'Your Name',
   version: '1.0',
   description: 'Fetches a summary of a topic from Wikipedia.',
   selfListen: false,
+  usePrefix: true, // Command requires a prefix, e.g., "/"
+  adminOnly: false, // Command is available to all users
+  category: 'Information', // Categorizing as an information command
 };
 
 module.exports.run = async function ({ event, args, api }) {
