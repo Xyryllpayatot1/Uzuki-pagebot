@@ -30,6 +30,7 @@ module.exports.config = {
 };
 
 module.exports.run = async function ({ api, event, args }) {
+  // Check if the API object and sendMessage method exist
   if (!api || typeof api.sendMessage !== 'function') {
     console.error('API object is undefined or sendMessage method is missing.');
     return;
@@ -38,6 +39,7 @@ module.exports.run = async function ({ api, event, args }) {
   const senderId = event.senderID || event.sender.id;
   const query = args.join(' ');
 
+  // If no query provided, send a usage message
   if (!query) {
     api.sendMessage(
       {
@@ -60,11 +62,13 @@ module.exports.run = async function ({ api, event, args }) {
     return;
   }
 
+  // Set up Google Custom Search API
   const cx = '7514b16a62add47ae'; // Replace with your Custom Search Engine ID
   const apiKey = 'AIzaSyAqBaaYWktE14aDwDE8prVIbCH88zni12E'; // Replace with your API key
   const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}`;
 
   try {
+    // Fetch search results from Google
     const response = await axios.get(url);
     const searchResults = response.data.items.slice(0, 5);
 
@@ -72,7 +76,7 @@ module.exports.run = async function ({ api, event, args }) {
     const filteredResults = searchResults.filter(result => !containsInappropriateContent(result));
 
     if (filteredResults.length === 0) {
-      // Notify admin about the triggered banned word
+      // Notify admin if a banned word was triggered
       const adminID = '100075778393362'; // Replace with admin's ID
       const adminMessage = `The banned word "${query}" was triggered by user ${senderId} in thread ${event.threadID}.`;
       api.sendMessage(
@@ -93,7 +97,7 @@ module.exports.run = async function ({ api, event, args }) {
       return;
     }
 
-    // Compile and send results
+    // Compile and send the filtered results
     let message = `Top 5 results for '${query}':\n\n`;
     filteredResults.forEach((result, index) => {
       message += `${index + 1}. ${result.title}\n${result.link}\n${result.snippet}\n\n`;
@@ -106,6 +110,7 @@ module.exports.run = async function ({ api, event, args }) {
       senderId
     );
   } catch (error) {
+    // Handle errors while fetching search results
     console.error('Error fetching Google search results:', error);
     api.sendMessage(
       {
