@@ -23,23 +23,42 @@ module.exports.run = function ({ event, args }) {
     const commandFiles = fs
       .readdirSync(commandsPath)
       .filter((file) => file.endsWith(".js"));
-    message += "Commands:\n";
+    
+    // Group commands by category
+    let categorizedCommands = {};
+
     commandFiles.forEach((file) => {
       const command = require(path.join(commandsPath, file));
       if (command.config) {
-        message += `${command.config.usePrefix ? PREFIX : ""}${command.config.name}\n`;
-        message += `Author: ${command.config.author}\n`;
-        message += `Description: ${command.config.description}\n\n`;
-        // message += `Admin Only: ${command.config.adminOnly ? "Yes" : "No"}\n`;
-        // message += `Prefix Required: ${command.config.usePrefix ? "Yes" : "No"}\n\n`;
+        let category = command.config.category || "Uncategorized";
+        
+        // Initialize category if it doesn't exist
+        if (!categorizedCommands[category]) {
+          categorizedCommands[category] = [];
+        }
+
+        categorizedCommands[category].push(command);
       }
     });
 
-  
+    // Prepare message with sorted and grouped commands
+    Object.keys(categorizedCommands).sort().forEach((category) => {
+      message += `${category}:\n`; // Add category title
+
+      categorizedCommands[category].sort((a, b) => a.config.name.localeCompare(b.config.name)) // Sort commands by name
+        .forEach((command) => {
+          message += `${command.config.usePrefix ? PREFIX : ""}${command.config.name} - `;
+          message += `Author: ${command.config.author}, `;
+          message += `Description: ${command.config.description}\n`;
+        });
+      
+      message += "\n"; // Add extra space after each category
+    });
 
     message += "\u2B50 Thank you for using Uzuki Mikata!\n";
     message += "This is an early access version. If you encounter any issues or bugs, please contact my owner:\n";
     message += "\u2709 Jhon Xyryll Samoy\n";
+    
     // Send the message to the user
     api.sendMessage(message, event.sender.id);
   }
