@@ -47,8 +47,8 @@ module.exports.run = function ({ event, args }) {
 
       categorizedCommands[category].sort((a, b) => a.config.name.localeCompare(b.config.name)) // Sort commands by name
         .forEach((command) => {
-          message += `${command.config.usePrefix ? PREFIX : ""}${command.config.name} - `;
-          message += `Author: ${command.config.author}, `;
+          message += `${command.config.usePrefix ? PREFIX : ""}${command.config.name} -\n `;
+          message += `Author: ${command.config.author},\n`;
           message += `Description: ${command.config.description}\n`;
         });
       
