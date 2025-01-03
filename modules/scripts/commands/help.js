@@ -56,7 +56,6 @@ module.exports.run = function ({ event, args }) {
       message += `╰───────────────\n`; // Add extra space after each category
     });
 
-    message += "\n𝗧𝘆𝗽𝗲 *help <command name>* to see details of any command.\n";
     message += "Thank you for using Uzuki Mikata! If you encounter any issues or bugs, please contact my owner:\n";
     message += "\u2709 Jhon Xyryll Samoy\n";
 
