@@ -29,7 +29,7 @@ module.exports.config = {
   usePrefix: true,
 };
 
-module.exports.run = async function ({ api, event, args }) {
+module.exports.run = async function ({ event, args, api }) {
   // Check if the API object and sendMessage method exist
   if (!api || typeof api.sendMessage !== 'function') {
     console.error('API object is undefined or sendMessage method is missing.');
