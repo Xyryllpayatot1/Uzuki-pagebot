@@ -1,122 +1,60 @@
 const axios = require('axios');
-
-// Helper function to check for inappropriate content
-function containsInappropriateContent(result) {
-  const bannedWords = ["porn", "xxx", "adult", "nsfw", "pinayflex", "lexilore", "jhonny sins", "hongkong doll"];
-  const title = result.title.toLowerCase();
-  const snippet = result.snippet.toLowerCase();
-
-  for (const word of bannedWords) {
-    if (title.includes(word) || snippet.includes(word)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// Map to store banned users
-const bannedUsers = new Map();
+const cheerio = require('cheerio');  // To scrape Google results
 
 module.exports.config = {
-  name: 'google',
-  aliases: ['search', 'g'],
-  version: '2.0',
-  author: 'XyryllPanget',
-  description: 'Searches Google for a given query.',
-  category: 'Utility',
-  usage: '/google <query>',
+  name: "google",
+  author: "XyryllPanget",
+  version: "1.0",
+  category: "AI",
+  description: "Search Google and retrieve results",
   adminOnly: false,
-  usePrefix: true,
+  usePrefix: false,
+  cooldown: 10,
 };
 
-module.exports.run = async function ({ event, args, api }) {
-  // Check if the API object and sendMessage method exist
-  if (!api || typeof api.sendMessage !== 'function') {
-    console.error('API object is undefined or sendMessage method is missing.');
-    return;
-  }
+module.exports.run = async function ({ event, args }) {
+  if (event.type === "message") {
+    let query = args.join(" ");
 
-  const senderId = event.senderID || event.sender.id;
-  const query = args.join(' ');
-
-  // If no query provided, send a usage message
-  if (!query) {
-    api.sendMessage(
-      {
-        text: 'Usage: /google <query>',
-      },
-      senderId
-    );
-    return;
-  }
-
-  // Check if the user is banned
-  if (bannedUsers.has(senderId)) {
-    const timeRemaining = (bannedUsers.get(senderId) - Date.now()) / 1000;
-    api.sendMessage(
-      {
-        text: `You are temporarily banned from using this command. Time remaining: ${timeRemaining.toFixed(0)} seconds.`,
-      },
-      senderId
-    );
-    return;
-  }
-
-  // Set up Google Custom Search API
-  const cx = '7514b16a62add47ae'; // Replace with your Custom Search Engine ID
-  const apiKey = 'AIzaSyAqBaaYWktE14aDwDE8prVIbCH88zni12E'; // Replace with your API key
-  const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(query)}`;
-
-  try {
-    // Fetch search results from Google
-    const response = await axios.get(url);
-    const searchResults = response.data.items.slice(0, 5);
-
-    // Filter out inappropriate content
-    const filteredResults = searchResults.filter(result => !containsInappropriateContent(result));
-
-    if (filteredResults.length === 0) {
-      // Notify admin if a banned word was triggered
-      const adminID = '100075778393362'; // Replace with admin's ID
-      const adminMessage = `The banned word "${query}" was triggered by user ${senderId} in thread ${event.threadID}.`;
-      api.sendMessage(
-        {
-          text: adminMessage,
-        },
-        adminID
-      );
-
-      // Ban the user for 30 seconds
-      bannedUsers.set(senderId, Date.now() + 30000);
-      api.sendMessage(
-        {
-          text: 'Sorry, that search query is not allowed.',
-        },
-        senderId
-      );
-      return;
+    if (!query) {
+      return api.sendMessage("Please provide a search query.", event.sender.id);
     }
 
-    // Compile and send the filtered results
-    let message = `Top 5 results for '${query}':\n\n`;
-    filteredResults.forEach((result, index) => {
-      message += `${index + 1}. ${result.title}\n${result.link}\n${result.snippet}\n\n`;
-    });
+    try {
+      // Scraping Google search results
+      let searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      let response = await axios.get(searchUrl);
 
-    api.sendMessage(
-      {
-        text: message,
-      },
-      senderId
-    );
-  } catch (error) {
-    // Handle errors while fetching search results
-    console.error('Error fetching Google search results:', error);
-    api.sendMessage(
-      {
-        text: 'An error occurred while searching Google. Please try again later.',
-      },
-      senderId
-    );
+      // Parsing the HTML with Cheerio to extract search result snippets
+      let $ = cheerio.load(response.data);
+      let results = [];
+
+      // Extracting the first few search result links and snippets
+      $('h3').each((index, element) => {
+        if (index >= 5) return;  // Limit to the first 5 results
+        let title = $(element).text();
+        let link = $(element).parent().attr('href');
+        let snippet = $(element).parent().next().text();
+        
+        if (title && link && snippet) {
+          results.push({ title, link, snippet });
+        }
+      });
+
+      // Formatting the response to send
+      if (results.length === 0) {
+        api.sendMessage("No results found.", event.sender.id);
+      } else {
+        let message = "Top Google results:\n\n";
+        results.forEach((result, index) => {
+          message += `${index + 1}. ${result.title}\n${result.link}\n${result.snippet}\n\n`;
+        });
+        api.sendMessage(message, event.sender.id);
+      }
+
+    } catch (error) {
+      console.log(error);
+      api.sendMessage("An error occurred while searching Google.", event.sender.id);
+    }
   }
 };
