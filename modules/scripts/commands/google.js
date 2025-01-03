@@ -1,5 +1,4 @@
 const axios = require('axios');
-const cheerio = require('cheerio');  // To scrape Google results
 
 module.exports.config = {
   name: "google",
@@ -21,35 +20,28 @@ module.exports.run = async function ({ event, args }) {
     }
 
     try {
-      // Scraping Google search results
-      let searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-      let response = await axios.get(searchUrl);
+      const apiKey = 'AIzaSyAqBaaYWktE14aDwDE8prVIbCH88zni12E';  // Replace with your API key
+      const cseId = '7514b16a62add47ae';  // Replace with your CSE ID
 
-      // Parsing the HTML with Cheerio to extract search result snippets
-      let $ = cheerio.load(response.data);
-      let results = [];
-
-      // Extracting the first few search result links and snippets
-      $('h3').each((index, element) => {
-        if (index >= 5) return;  // Limit to the first 5 results
-        let title = $(element).text();
-        let link = $(element).parent().attr('href');
-        let snippet = $(element).parent().next().text();
-        
-        if (title && link && snippet) {
-          results.push({ title, link, snippet });
-        }
+      // Make a request to the Google Custom Search API
+      let response = await axios.get('https://www.googleapis.com/customsearch/v1', {
+        params: {
+          key: apiKey,
+          cx: cseId,
+          q: query,
+        },
       });
 
-      // Formatting the response to send
-      if (results.length === 0) {
-        api.sendMessage("No results found.", event.sender.id);
-      } else {
+      const results = response.data.items;
+
+      if (results && results.length > 0) {
         let message = "Top Google results:\n\n";
-        results.forEach((result, index) => {
+        results.slice(0, 5).forEach((result, index) => {
           message += `${index + 1}. ${result.title}\n${result.link}\n${result.snippet}\n\n`;
         });
         api.sendMessage(message, event.sender.id);
+      } else {
+        api.sendMessage("No results found.", event.sender.id);
       }
 
     } catch (error) {
