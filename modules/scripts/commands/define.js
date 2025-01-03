@@ -12,6 +12,11 @@ module.exports.config = {
 };
 
 module.exports.run = async function ({ event, args, api }) {
+  if (!api) {
+    console.error("API object is missing!");
+    return;
+  }
+
   if (event.type === "message") {
     try {
       const word = args.join(" ").trim();
@@ -26,18 +31,18 @@ module.exports.run = async function ({ event, args, api }) {
       if (Array.isArray(data) && data.length > 0) {
         const wordData = data[0];
         const wordDefinition = wordData.meanings[0]?.definitions[0]?.definition || "No definition found.";
-        
+
         // Send the word definition message
         const definitionMessage = `📖 Word: *${word}*\n\nDefinition:\n${wordDefinition}`;
-        api.sendMessage(definitionMessage, event.threadID).catch(err => console.error("Error sending message:", err));
+        api.sendMessage(definitionMessage, event.threadID);
       } else {
-        api.sendMessage(`❌ No definition found for the word "${word}".`, event.threadID).catch(err => console.error("Error sending message:", err));
+        api.sendMessage(`❌ No definition found for the word "${word}".`, event.threadID);
       }
     } catch (error) {
       console.error("Error fetching word definition:", error);
-      
+
       // Handle API error gracefully
-      api.sendMessage("⚠️ An error occurred while fetching the word definition. Please try again later.", event.threadID).catch(err => console.error("Error sending error message:", err));
+      api.sendMessage("⚠️ An error occurred while fetching the word definition. Please try again later.", event.threadID);
     }
   }
 };
